@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Itaria Ceramics — Catalogue Generator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=Cinzel:wght@400;600;700&family=Cinzel+Decorative:wght@400;700&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --gold: #C9A84C;
+    --gold-light: #E8C97A;
+    --gold-dim: #8B7035;
+    --black: #0A0A08;
+    --dark: #111109;
+    --dark2: #1A1A14;
+    --cream: #F5EDD6;
+    --cream-dim: #C8BA96;
+  }
+
+  body {
+    background: #0D0D0A;
+    min-height: 100vh;
+    font-family: 'Cormorant Garamond', serif;
+    color: var(--cream);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 20px;
+  }
+
+  /* ─── Header ─── */
+  .page-header {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+  .page-header .brand {
+    font-family: 'Cinzel', serif;
+    font-size: 13px;
+    letter-spacing: 6px;
+    color: var(--gold);
+    margin-bottom: 8px;
+  }
+  .page-header h1 {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 28px;
+    color: var(--cream);
+    letter-spacing: 2px;
+    line-height: 1.2;
+  }
+  .page-header .sub {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 16px;
+    color: var(--gold-dim);
+    margin-top: 6px;
+  }
+  .gold-rule {
+    width: 120px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    margin: 16px auto;
+  }
+
+  /* ─── Form ─── */
+  .form-panel {
+    background: linear-gradient(135deg, #141410 0%, #1C1C14 100%);
+    border: 1px solid #2A2A1E;
+    border-top: 2px solid var(--gold-dim);
+    width: 100%;
+    max-width: 680px;
+    padding: 40px;
+    position: relative;
+    margin-bottom: 40px;
+  }
+  .form-panel::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: radial-gradient(ellipse at top left, rgba(201,168,76,0.04) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .corner { position: absolute; width: 16px; height: 16px; border-color: var(--gold); border-style: solid; }
+  .corner.tl { top: 8px; left: 8px; border-width: 1px 0 0 1px; }
+  .corner.tr { top: 8px; right: 8px; border-width: 1px 1px 0 0; }
+  .corner.bl { bottom: 8px; left: 8px; border-width: 0 0 1px 1px; }
+  .corner.br { bottom: 8px; right: 8px; border-width: 0 1px 1px 0; }
+
+  .form-section-title {
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    letter-spacing: 5px;
+    color: var(--gold);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .form-section-title::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, var(--gold-dim), transparent); }
+
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .form-grid .full { grid-column: 1/-1; }
+
+  label {
+    display: block;
+    font-family: 'Cinzel', serif;
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: var(--gold-dim);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+  }
+
+  input, select, textarea {
+    width: 100%;
+    background: rgba(0,0,0,0.4);
+    border: 1px solid #2E2E22;
+    border-bottom: 1px solid var(--gold-dim);
+    color: var(--cream);
+    padding: 10px 12px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.3s, background 0.3s;
+  }
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--gold);
+    background: rgba(201,168,76,0.04);
+  }
+  select option { background: #1A1A14; color: var(--cream); }
+  textarea { resize: vertical; min-height: 70px; line-height: 1.5; }
+
+  .btn-generate {
+    width: 100%;
+    margin-top: 28px;
+    padding: 16px;
+    background: linear-gradient(135deg, #8B7035, #C9A84C, #E8C97A, #C9A84C, #8B7035);
+    background-size: 200% 100%;
+    border: none;
+    color: #0A0A08;
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    letter-spacing: 5px;
+    cursor: pointer;
+    transition: background-position 0.5s, transform 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+  .btn-generate:hover { background-position: 100% 0; transform: translateY(-1px); }
+  .btn-generate:active { transform: translateY(0); }
+
+  .btn-row { display: flex; gap: 12px; margin-top: 16px; }
+  .btn-secondary {
+    flex: 1;
+    padding: 12px;
+    background: transparent;
+    border: 1px solid var(--gold-dim);
+    color: var(--gold);
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    letter-spacing: 3px;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  .btn-secondary:hover { background: rgba(201,168,76,0.08); border-color: var(--gold); }
+
+  /* ─── Preview Card ─── */
+  #preview-area { width: 100%; max-width: 900px; }
+  #preview-area h2 {
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    letter-spacing: 5px;
+    color: var(--gold-dim);
+    margin-bottom: 20px;
+    text-align: center;
+  }
+
+  .catalogue-card {
+    background: var(--black);
+    border: 1px solid #2A2A1E;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    animation: fadeIn 0.6s ease;
+  }
+
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+  .catalogue-card .gold-border-top {
+    height: 3px;
+    background: linear-gradient(90deg, var(--gold-dim), var(--gold), var(--gold-light), var(--gold), var(--gold-dim));
+  }
+
+  /* Card Header */
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 22px 28px 18px;
+    border-bottom: 1px solid #1E1E16;
+  }
+  .card-brand { font-family: 'Cinzel Decorative', serif; font-size: 18px; color: var(--gold); }
+  .card-brand-sub { font-family: 'Cinzel', serif; font-size: 8px; letter-spacing: 4px; color: var(--gold-dim); margin-top: 2px; }
+  .card-meta-right { text-align: right; }
+  .card-meta-right .cat-label { font-family: 'Cinzel', serif; font-size: 8px; letter-spacing: 3px; color: var(--gold-dim); }
+  .card-meta-right .series-name { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 15px; color: var(--cream-dim); }
+
+  /* Card Body */
+  .card-body { display: flex; }
+
+  /* Left: Image column */
+  .card-image-col {
+    width: 42%;
+    min-height: 500px;
+    position: relative;
+    flex-shrink: 0;
+    overflow: hidden;
+    background: #0D0D0A;
+  }
+  .card-image-col img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    filter: brightness(0.92) saturate(1.1);
+  }
+  .card-image-col .img-badge {
+    position: absolute;
+    top: 16px;
+    left: 0;
+    background: rgba(10,10,8,0.85);
+    border: 1px solid var(--gold-dim);
+    border-left: none;
+    padding: 6px 14px;
+    font-family: 'Cinzel', serif;
+    font-size: 8px;
+    letter-spacing: 3px;
+    color: var(--gold);
+  }
+  .card-image-col .corner { border-color: var(--gold); opacity: 0.6; }
+
+  .img-placeholder {
+    width: 100%;
+    height: 100%;
+    min-height: 500px;
+    background: linear-gradient(135deg, #1A1A10 0%, #252518 50%, #1A1A10 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+  }
+  .img-placeholder .ph-icon { font-size: 48px; opacity: 0.2; }
+  .img-placeholder .ph-text { font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 3px; color: var(--gold-dim); opacity: 0.6; }
+
+  /* Right: Details column */
+  .card-details-col {
+    flex: 1;
+    padding: 32px 32px 28px;
+    display: flex;
+    flex-direction: column;
+    border-left: 1px solid #1E1E16;
+    position: relative;
+    background: linear-gradient(180deg, #0F0F0C 0%, #0A0A08 100%);
+  }
+  .card-details-col::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: radial-gradient(ellipse at top right, rgba(201,168,76,0.04) 0%, transparent 50%);
+    pointer-events: none;
+  }
+
+  .tile-type-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid var(--gold-dim);
+    padding: 5px 14px;
+    margin-bottom: 20px;
+    align-self: flex-start;
+  }
+  .tile-type-badge::before { content: '•'; color: var(--gold); font-size: 8px; }
+  .tile-type-badge span { font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 3px; color: var(--gold); }
+
+  .tile-name-main {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 44px;
+    color: var(--cream);
+    line-height: 0.95;
+    letter-spacing: 1px;
+  }
+  .tile-name-sub {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 30px;
+    color: var(--gold);
+    margin-top: 4px;
+    line-height: 1;
+  }
+  .tile-collection {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 13px;
+    color: var(--gold-dim);
+    margin-top: 8px;
+    letter-spacing: 1px;
+  }
+
+  .card-divider { height: 1px; background: linear-gradient(90deg, var(--gold-dim), transparent); margin: 20px 0; }
+
+  .tile-tagline {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 15px;
+    color: var(--cream-dim);
+    line-height: 1.7;
+    margin-bottom: 24px;
+  }
+
+  /* Specs */
+  .specs-grid { flex: 1; }
+  .spec-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 9px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    gap: 16px;
+  }
+  .spec-label {
+    font-family: 'Cinzel', serif;
+    font-size: 8px;
+    letter-spacing: 3px;
+    color: var(--gold-dim);
+    flex-shrink: 0;
+  }
+  .spec-dots { flex: 1; border-bottom: 1px dotted rgba(201,168,76,0.2); margin-bottom: 4px; }
+  .spec-value {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--cream);
+    text-align: right;
+  }
+
+  /* Shades */
+  .shades-section { margin-top: 20px; }
+  .shades-label { font-family: 'Cinzel', serif; font-size: 8px; letter-spacing: 3px; color: var(--gold-dim); margin-bottom: 10px; }
+  .shades-row { display: flex; gap: 8px; }
+  .shade-swatch {
+    width: 36px;
+    height: 36px;
+    border: 1px solid rgba(255,255,255,0.1);
+    cursor: pointer;
+    position: relative;
+    transition: transform 0.2s;
+  }
+  .shade-swatch:hover { transform: scale(1.1); }
+  .shade-swatch.active { border: 2px solid var(--gold); }
+
+  /* Footer strip */
+  .card-footer {
+    display: flex;
+    border-top: 1px solid #1E1E16;
+    background: #080808;
+  }
+  .footer-stat {
+    flex: 1;
+    text-align: center;
+    padding: 14px 8px;
+    border-right: 1px solid #1E1E16;
+  }
+  .footer-stat:last-child { border-right: none; }
+  .footer-stat .val {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 18px;
+    color: var(--gold);
+    line-height: 1;
+  }
+  .footer-stat .lbl {
+    font-family: 'Cinzel', serif;
+    font-size: 7px;
+    letter-spacing: 2px;
+    color: var(--gold-dim);
+    margin-top: 4px;
+  }
+
+  .card-bottom-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 28px;
+    background: #050504;
+    border-top: 1px solid #1E1E16;
+  }
+  .bottom-bar-left { font-family: 'Cinzel', serif; font-size: 8px; letter-spacing: 3px; color: #3A3A2A; }
+  .bottom-bar-center { font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 4px; color: var(--gold-dim); }
+  .bottom-bar-right { font-family: 'Cinzel', serif; font-size: 8px; letter-spacing: 3px; color: #3A3A2A; }
+
+  /* Download section */
+  .action-row { display: flex; gap: 12px; margin-top: 24px; justify-content: center; }
+
+  /* Hidden canvas for export */
+  #export-canvas { display: none; }
+
+  @media (max-width: 640px) {
+    .form-grid { grid-template-columns: 1fr; }
+    .card-body { flex-direction: column; }
+    .card-image-col { width: 100%; min-height: 280px; }
+    .tile-name-main { font-size: 30px; }
+    .tile-name-sub { font-size: 22px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="page-header">
+  <div class="brand">ITARIA CERAMICS</div>
+  <div class="gold-rule"></div>
+  <h1>Catalogue Card Generator</h1>
+  <div class="sub">Premium Tile Collections · Since 2008</div>
+</header>
+
+<!-- FORM -->
+<div class="form-panel">
+  <div class="corner tl"></div><div class="corner tr"></div>
+  <div class="corner bl"></div><div class="corner br"></div>
+
+  <div class="form-section-title">PRODUCT DETAILS</div>
+
+  <div class="form-grid">
+    <div class="full">
+      <label>Tile Image URL</label>
+      <input type="url" id="imageUrl" placeholder="https://example.com/tile-image.jpg" />
+    </div>
+
+    <div>
+      <label>Tile Name (Main)</label>
+      <input type="text" id="tileName" placeholder="e.g. AZURE" value="AZURE" />
+    </div>
+    <div>
+      <label>Tile Name (Sub / Italic)</label>
+      <input type="text" id="tileNameSub" placeholder="e.g. Sera" value="Sera" />
+    </div>
+
+    <div class="full">
+      <label>Collection Name</label>
+      <input type="text" id="collection" placeholder="e.g. Oceanic Heritage Collection — Vol. III" value="Oceanic Heritage Collection — Vol. III" />
+    </div>
+
+    <div class="full">
+      <label>Tagline / Description</label>
+      <textarea id="tagline" placeholder="Deep cobalt depth, alive with light...">Deep cobalt depth, alive with light. Born from the Adriatic coast — Azure Sera carries the soul of Italian craftsmanship into every wall it graces. Timeless. Unapologetically beautiful.</textarea>
+    </div>
+
+    <div>
+      <label>Tile Type</label>
+      <select id="tileType">
+        <option value="CERAMIC WALL TILE">CERAMIC WALL TILE</option>
+        <option value="PORCELAIN FLOOR TILE">PORCELAIN FLOOR TILE</option>
+        <option value="VITRIFIED TILE">VITRIFIED TILE</option>
+        <option value="MOSAIC TILE">MOSAIC TILE</option>
+        <option value="NATURAL STONE TILE">NATURAL STONE TILE</option>
+      </select>
+    </div>
+    <div>
+      <label>Series / Catalogue</label>
+      <input type="text" id="series" placeholder="e.g. Oceanic Heritage Series" value="Oceanic Heritage Series" />
+    </div>
+
+    <div>
+      <label>Size</label>
+      <input type="text" id="size" placeholder="e.g. 300 × 600 mm" value="300 × 600 mm" />
+    </div>
+    <div>
+      <label>Thickness</label>
+      <input type="text" id="thickness" placeholder="e.g. 8 mm" value="8 mm" />
+    </div>
+
+    <div>
+      <label>Finish</label>
+      <select id="finish">
+        <option value="High Gloss">High Gloss</option>
+        <option value="Matte">Matte</option>
+        <option value="Satin">Satin</option>
+        <option value="Rustic">Rustic</option>
+        <option value="Polished">Polished</option>
+        <option value="Lappato">Lappato</option>
+        <option value="Sugar">Sugar</option>
+        <option value="Natural Stone">Natural Stone</option>
+      </select>
+    </div>
+    <div>
+      <label>Water Absorption</label>
+      <input type="text" id="waterAbs" placeholder="e.g. ≤ 0.5 %" value="≤ 0.5 %" />
+    </div>
+
+    <div>
+      <label>Usage</label>
+      <input type="text" id="usage" placeholder="e.g. Wall · Interior" value="Wall · Interior" />
+    </div>
+    <div>
+      <label>MOQ</label>
+      <input type="text" id="moq" placeholder="e.g. 500 sq. ft." value="500 sq. ft." />
+    </div>
+
+    <div class="full">
+      <label>Image Badge Text</label>
+      <input type="text" id="badge" placeholder="e.g. HIGH GLOSS · PREMIUM GRADE" value="HIGH GLOSS · PREMIUM GRADE" />
+    </div>
+  </div>
+
+  <button class="btn-generate" onclick="generateCard()">✦ &nbsp; GENERATE CATALOGUE CARD &nbsp; ✦</button>
+  <div class="btn-row">
+    <button class="btn-secondary" onclick="loadDemo()">LOAD DEMO</button>
+    <button class="btn-secondary" onclick="clearForm()">CLEAR FORM</button>
+  </div>
+</div>
+
+<!-- PREVIEW -->
+<div id="preview-area" style="display:none;">
+  <h2>✦ &nbsp; CATALOGUE CARD PREVIEW &nbsp; ✦</h2>
+  <div class="catalogue-card" id="catalogue-card">
+    <div class="gold-border-top"></div>
+
+    <!-- Card header -->
+    <div class="card-header">
+      <div>
+        <div class="card-brand">ITARIA CERAMICS</div>
+        <div class="card-brand-sub">PREMIUM TILE COLLECTIONS · SINCE 2008</div>
+      </div>
+      <div class="card-meta-right">
+        <div class="cat-label">PRODUCT CATALOGUE · 2025</div>
+        <div class="series-name" id="c-series">Oceanic Heritage Series</div>
+      </div>
+    </div>
+
+    <!-- Card body -->
+    <div class="card-body">
+      <!-- Image column -->
+      <div class="card-image-col" id="c-img-col">
+        <div class="img-placeholder" id="c-img-placeholder">
+          <div class="ph-icon">◈</div>
+          <div class="ph-text">TILE IMAGE</div>
+        </div>
+        <img id="c-img" src="" alt="Tile" style="display:none; position:absolute; top:0; left:0; width:100%; height:100%;">
+        <div class="img-badge" id="c-badge">HIGH GLOSS · PREMIUM GRADE</div>
+        <div class="corner tl"></div><div class="corner bl"></div>
+        <div class="corner tr" style="right:8px;"></div><div class="corner br" style="right:8px;"></div>
+      </div>
+
+      <!-- Details column -->
+      <div class="card-details-col">
+        <div class="tile-type-badge"><span id="c-type">CERAMIC WALL TILE</span></div>
+
+        <div class="tile-name-main" id="c-name">AZURE</div>
+        <div class="tile-name-sub" id="c-name-sub">Sera</div>
+        <div class="tile-collection" id="c-collection">Oceanic Heritage Collection — Vol. III</div>
+
+        <div class="card-divider"></div>
+
+        <div class="tile-tagline" id="c-tagline">Deep cobalt depth, alive with light.</div>
+
+        <div class="specs-grid">
+          <div class="spec-row">
+            <div class="spec-label">SIZE</div>
+            <div class="spec-dots"></div>
+            <div class="spec-value" id="c-size">300 × 600 mm</div>
+          </div>
+          <div class="spec-row">
+            <div class="spec-label">THICKNESS</div>
+            <div class="spec-dots"></div>
+            <div class="spec-value" id="c-thickness">8 mm</div>
+          </div>
+          <div class="spec-row">
+            <div class="spec-label">FINISH</div>
+            <div class="spec-dots"></div>
+            <div class="spec-value" id="c-finish">High Gloss</div>
+          </div>
+          <div class="spec-row">
+            <div class="spec-label">WATER ABS.</div>
+            <div class="spec-dots"></div>
+            <div class="spec-value" id="c-water">≤ 0.5 %</div>
+          </div>
+          <div class="spec-row">
+            <div class="spec-label">USAGE</div>
+            <div class="spec-dots"></div>
+            <div class="spec-value" id="c-usage">Wall · Interior</div>
+          </div>
+          <div class="spec-row">
+            <div class="spec-label">MOQ</div>
+            <div class="spec-dots"></div>
+            <div class="spec-value" id="c-moq">500 sq. ft.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats footer -->
+    <div class="card-footer">
+      <div class="footer-stat"><div class="val">500+</div><div class="lbl">SKUS IN COLLECTION</div></div>
+      <div class="footer-stat"><div class="val">40+</div><div class="lbl">EXPORT COUNTRIES</div></div>
+      <div class="footer-stat"><div class="val">BIS</div><div class="lbl">CERTIFIED QUALITY</div></div>
+      <div class="footer-stat"><div class="val">15yr</div><div class="lbl">INDUSTRY LEGACY</div></div>
+    </div>
+
+    <!-- Bottom bar -->
+    <div class="card-bottom-bar">
+      <div class="bottom-bar-left">EXPORT READY · PAN INDIA DELIVERY</div>
+      <div class="bottom-bar-center">ITARIA CERAMICS</div>
+      <div class="bottom-bar-right">BIS CERTIFIED · ISO 9001:2015</div>
+    </div>
+  </div>
+
+  <div class="action-row">
+    <button class="btn-secondary" onclick="printCard()">⊞ &nbsp; PRINT / SAVE AS PDF</button>
+    <button class="btn-secondary" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑ &nbsp; EDIT AGAIN</button>
+  </div>
+</div>
+
+<script>
+function generateCard() {
+  const get = id => document.getElementById(id).value.trim();
+
+  // Populate fields
+  document.getElementById('c-name').textContent   = get('tileName') || 'TILE NAME';
+  document.getElementById('c-name-sub').textContent = get('tileNameSub') || '';
+  document.getElementById('c-collection').textContent = get('collection') || '';
+  document.getElementById('c-tagline').textContent = get('tagline') || '';
+  document.getElementById('c-type').textContent    = get('tileType');
+  document.getElementById('c-series').textContent  = get('series') || '';
+  document.getElementById('c-size').textContent    = get('size') || '—';
+  document.getElementById('c-thickness').textContent = get('thickness') || '—';
+  document.getElementById('c-finish').textContent  = get('finish') || '—';
+  document.getElementById('c-water').textContent   = get('waterAbs') || '—';
+  document.getElementById('c-usage').textContent   = get('usage') || '—';
+  document.getElementById('c-moq').textContent     = get('moq') || '—';
+  document.getElementById('c-badge').textContent   = get('badge') || '';
+
+  // Image
+  const url = get('imageUrl');
+  const img = document.getElementById('c-img');
+  const ph  = document.getElementById('c-img-placeholder');
+  if (url) {
+    img.src = url;
+    img.style.display = 'block';
+    ph.style.display  = 'none';
+    img.onerror = () => {
+      img.style.display = 'none';
+      ph.style.display  = 'flex';
+    };
+  } else {
+    img.style.display = 'none';
+    ph.style.display  = 'flex';
+  }
+
+  // Show
+  const area = document.getElementById('preview-area');
+  area.style.display = 'block';
+  area.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function loadDemo() {
+  const fields = {
+    imageUrl: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800',
+    tileName: 'AZURE',
+    tileNameSub: 'Sera',
+    collection: 'Oceanic Heritage Collection — Vol. III',
+    tagline: 'Deep cobalt depth, alive with light. Born from the Adriatic coast — Azure Sera carries the soul of Italian craftsmanship into every wall it graces. Timeless. Unapologetically beautiful.',
+    tileType: 'CERAMIC WALL TILE',
+    series: 'Oceanic Heritage Series',
+    size: '300 × 600 mm',
+    thickness: '8 mm',
+    finish: 'High Gloss',
+    waterAbs: '≤ 0.5 %',
+    usage: 'Wall · Interior',
+    moq: '500 sq. ft.',
+    badge: 'HIGH GLOSS · PREMIUM GRADE',
+  };
+  Object.entries(fields).forEach(([id, val]) => {
+    const el = document.getElementById(id);
+    if (el) el.value = val;
+  });
+}
+
+function clearForm() {
+  ['imageUrl','tileName','tileNameSub','collection','tagline','size','thickness','waterAbs','usage','moq','badge','series']
+    .forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+  document.getElementById('preview-area').style.display = 'none';
+}
+
+function printCard() {
+  const card = document.getElementById('catalogue-card').outerHTML;
+  const w = window.open('', '_blank');
+  w.document.write(`<!DOCTYPE html><html><head>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=Cinzel:wght@400;600;700&family=Cinzel+Decorative:wght@400;700&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+    <style>
+      ${document.querySelector('style').textContent}
+      body { background: #0A0A08; padding: 0; }
+      @media print { @page { margin: 0; } }
+    </style>
+    </head><body>${card}</body></html>`);
+  w.document.close();
+  setTimeout(() => w.print(), 1200);
+}
+</script>
+</body>
+</html>
